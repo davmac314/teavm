@@ -100,6 +100,7 @@ public class TeaVMTool implements BaseTeaVMTool {
     private WasmTarget webAssemblyTarget;
     private WasmBinaryVersion wasmVersion = WasmBinaryVersion.V_0x1;
     private Set<File> generatedFiles = new HashSet<>();
+    private BuildTarget buildTarget;
 
     public File getTargetDirectory() {
         return targetDirectory;
@@ -108,6 +109,14 @@ public class TeaVMTool implements BaseTeaVMTool {
     @Override
     public void setTargetDirectory(File targetDirectory) {
         this.targetDirectory = targetDirectory;
+    }
+
+    /**
+     * Set the build target, which is used for creation of output files.
+     * @param buildTarget    The BuildTarget to use for creation of output.
+     */
+    public void setBuildTarget(BuildTarget buildTarget) {
+        this.buildTarget = buildTarget;
     }
 
     public String getTargetFileName() {
@@ -418,7 +427,9 @@ public class TeaVMTool implements BaseTeaVMTool {
             if (runtime == RuntimeCopyOperation.MERGED) {
                 javaScriptTarget.add(runtimeInjector);
             }
-            BuildTarget buildTarget = new DirectoryBuildTarget(targetDirectory);
+            if (buildTarget == null) {
+                buildTarget = new DirectoryBuildTarget(targetDirectory);
+            }
             String outputName = getResolvedTargetFileName();
             vm.build(buildTarget, outputName);
             if (vm.wasCancelled()) {

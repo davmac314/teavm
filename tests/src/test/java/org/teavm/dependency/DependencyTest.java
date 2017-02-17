@@ -18,6 +18,8 @@ package org.teavm.dependency;
 import com.carrotsearch.hppc.IntOpenHashSet;
 import com.carrotsearch.hppc.IntSet;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -48,6 +50,7 @@ import org.teavm.model.instructions.InvokeInstruction;
 import org.teavm.model.instructions.PutElementInstruction;
 import org.teavm.model.instructions.UnwrapArrayInstruction;
 import org.teavm.parsing.ClasspathClassHolderSource;
+import org.teavm.vm.BuildTarget;
 import org.teavm.vm.TeaVM;
 import org.teavm.vm.TeaVMBuilder;
 import org.teavm.vm.TeaVMPhase;
@@ -128,7 +131,20 @@ public class DependencyTest {
         MethodReference testMethod = new MethodReference(DependencyTestData.class,
                 testName.getMethodName(), void.class);
         vm.entryPoint(testMethod).withValue(0, DependencyTestData.class.getName());
-        vm.build(fileName -> new ByteArrayOutputStream(), "out");
+        vm.build(new BuildTarget() {
+            @Override
+            public OutputStream createResource(String fileName)
+                    throws IOException
+            {
+                return new ByteArrayOutputStream();
+            }
+            @Override
+            public OutputStream appendResource(String fileName)
+                    throws IOException
+            {
+                return new ByteArrayOutputStream();
+            }
+        }, "out");
 
         List<Problem> problems = vm.getProblemProvider().getSevereProblems();
         if (!problems.isEmpty()) {

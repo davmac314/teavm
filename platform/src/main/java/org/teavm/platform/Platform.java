@@ -104,6 +104,10 @@ public final class Platform {
     @PluggableDependency(PlatformGenerator.class)
     private static native <T> T newInstanceImpl(PlatformClass cls);
 
+    /**
+     * Lookup, and apparently initialise, a class by name.
+     * We mark @Async as the class initialisation may be asynchronous.
+     */
     @GeneratedBy(PlatformGenerator.class)
     @PluggableDependency(PlatformGenerator.class)
     public static native PlatformClass lookupClass(String name);
